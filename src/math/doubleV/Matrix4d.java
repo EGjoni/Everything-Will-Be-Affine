@@ -14,9 +14,14 @@
  * limitations under the License.
  ******************************************************************************/
 
-package sceneGraph.math.doubleV;
+package math.doubleV;
 
 import java.io.Serializable;
+
+import sceneGraph.math.doubleV.MRotation;
+import sceneGraph.math.doubleV.MathUtils;
+import sceneGraph.math.doubleV.SGVec_3d;
+import sceneGraph.math.doubleV.Vec3d;
 
 /** Encapsulates a <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> 4 by 4 matrix. Like
  * the {@link SGVec_3d} class it allows the chaining of methods by returning a reference to itself. For example:
@@ -97,17 +102,17 @@ public class Matrix4d implements Serializable {
 		this.set(values);
 	}
 
-	/** Constructs a rotation matrix from the given {@link Quaternion}.
-	 * @param quaternion The quaternion to be copied. (The quaternion is not modified) */
-	public Matrix4d (Quaternion quaternion) {
-		this.set(quaternion);
+	/** Constructs a rotation matrix from the given {@link MRotation}.
+	 * @param MRotation The MRotation to be copied. (The MRotation is not modified) */
+	public Matrix4d (MRotation MRotation) {
+		this.set(MRotation);
 	}
 
 	/** Construct a matrix from the given translation, rotation and scale.
 	 * @param position The translation
 	 * @param rotation The rotation, must be normalized
 	 * @param scale The scale */
-	public <V extends Vec3d<?>> Matrix4d (V position, Quaternion rotation, V scale) {
+	public <V extends Vec3d<?>> Matrix4d (V position, MRotation rotation, V scale) {
 		set(position, rotation, scale);
 	}
 
@@ -206,50 +211,50 @@ public class Matrix4d implements Serializable {
 		}
 	}
 
-	/** Sets the matrix to a rotation matrix representing the quaternion.
+	/** Sets the matrix to a rotation matrix representing the MRotation.
 	 * 
-	 * @param quaternion The quaternion that is to be used to set this matrix.
+	 * @param MRotation The MRotation that is to be used to set this matrix.
 	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix4d set (Quaternion quaternion) {
-		return set(quaternion.getQ1(), quaternion.getQ2(), quaternion.getQ3(), quaternion.getQ0());
+	public Matrix4d set (MRotation MRotation) {
+		return set(MRotation.getQ1(), MRotation.getQ2(), MRotation.getQ3(), MRotation.getQ0());
 	}
 
-	/** Sets the matrix to a rotation matrix representing the quaternion.
+	/** Sets the matrix to a rotation matrix representing the MRotation.
 	 * 
-	 * @param quaternionX The X component of the quaternion that is to be used to set this matrix.
-	 * @param quaternionY The Y component of the quaternion that is to be used to set this matrix.
-	 * @param quaternionZ The Z component of the quaternion that is to be used to set this matrix.
-	 * @param quaternionW The W component of the quaternion that is to be used to set this matrix.
+	 * @param MRotationX The X component of the MRotation that is to be used to set this matrix.
+	 * @param MRotationY The Y component of the MRotation that is to be used to set this matrix.
+	 * @param MRotationZ The Z component of the MRotation that is to be used to set this matrix.
+	 * @param MRotationW The W component of the MRotation that is to be used to set this matrix.
 	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix4d set (double quaternionX, double quaternionY, double quaternionZ, double quaternionW) {
-		return set(0d, 0d, 0d, quaternionX, quaternionY, quaternionZ, quaternionW);
+	public Matrix4d set (double MRotationX, double MRotationY, double MRotationZ, double MRotationW) {
+		return set(0d, 0d, 0d, MRotationX, MRotationY, MRotationZ, MRotationW);
 	}
 
 	/** Set this matrix to the specified translation and rotation.
 	 * @param position The translation
 	 * @param orientation The rotation, must be normalized
 	 * @return This matrix for chaining */
-	public <V extends Vec3d<?>>  Matrix4d set (V position, Quaternion orientation) {
+	public <V extends Vec3d<?>>  Matrix4d set (V position, MRotation orientation) {
 		return set(position.x, position.y, position.z, 
 				orientation.getQ1(), orientation.getQ2(), orientation.getQ3(), orientation.getQ0());
 	}
 
-	/** Sets the matrix to a rotation matrix representing the translation and quaternion.
+	/** Sets the matrix to a rotation matrix representing the translation and MRotation.
 	 * 
 	 * @param translationX The X component of the translation that is to be used to set this matrix.
 	 * @param translationY The Y component of the translation that is to be used to set this matrix.
 	 * @param translationZ The Z component of the translation that is to be used to set this matrix.
-	 * @param quaternionX The X component of the quaternion that is to be used to set this matrix.
-	 * @param quaternionY The Y component of the quaternion that is to be used to set this matrix.
-	 * @param quaternionZ The Z component of the quaternion that is to be used to set this matrix.
-	 * @param quaternionW The W component of the quaternion that is to be used to set this matrix.
+	 * @param MRotationX The X component of the MRotation that is to be used to set this matrix.
+	 * @param MRotationY The Y component of the MRotation that is to be used to set this matrix.
+	 * @param MRotationZ The Z component of the MRotation that is to be used to set this matrix.
+	 * @param MRotationW The W component of the MRotation that is to be used to set this matrix.
 	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix4d set (double translationX, double translationY, double translationZ, double quaternionX, double quaternionY,
-			double quaternionZ, double quaternionW) {
-		final double xs = quaternionX * 2d, ys = quaternionY * 2d, zs = quaternionZ * 2d;
-		final double wx = quaternionW * xs, wy = quaternionW * ys, wz = quaternionW * zs;
-		final double xx = quaternionX * xs, xy = quaternionX * ys, xz = quaternionX * zs;
-		final double yy = quaternionY * ys, yz = quaternionY * zs, zz = quaternionZ * zs;
+	public Matrix4d set (double translationX, double translationY, double translationZ, double MRotationX, double MRotationY,
+			double MRotationZ, double MRotationW) {
+		final double xs = MRotationX * 2d, ys = MRotationY * 2d, zs = MRotationZ * 2d;
+		final double wx = MRotationW * xs, wy = MRotationW * ys, wz = MRotationW * zs;
+		final double xx = MRotationX * xs, xy = MRotationX * ys, xz = MRotationX * zs;
+		final double yy = MRotationY * ys, yz = MRotationY * zs, zz = MRotationZ * zs;
 
 		val[M00] = (1.0d - (yy + zz));
 		val[M01] = (xy - wz);
@@ -278,31 +283,31 @@ public class Matrix4d implements Serializable {
 	 * @param orientation The rotation, must be normalized
 	 * @param scale The scale
 	 * @return This matrix for chaining */
-	public <V extends Vec3d<?>>  Matrix4d set (V position, Quaternion orientation, V scale) {
+	public <V extends Vec3d<?>>  Matrix4d set (V position, MRotation orientation, V scale) {
 		return set(position.x, position.y, position.z, 
 				orientation.getQ1(), orientation.getQ2(), orientation.getQ3(), orientation.getQ0(), scale.x,
 				scale.y, scale.z);
 	}
 
-	/** Sets the matrix to a rotation matrix representing the translation and quaternion.
+	/** Sets the matrix to a rotation matrix representing the translation and MRotation.
 	 * 
 	 * @param translationX The X component of the translation that is to be used to set this matrix.
 	 * @param translationY The Y component of the translation that is to be used to set this matrix.
 	 * @param translationZ The Z component of the translation that is to be used to set this matrix.
-	 * @param quaternionX The X component of the quaternion that is to be used to set this matrix.
-	 * @param quaternionY The Y component of the quaternion that is to be used to set this matrix.
-	 * @param quaternionZ The Z component of the quaternion that is to be used to set this matrix.
-	 * @param quaternionW The W component of the quaternion that is to be used to set this matrix.
+	 * @param MRotationX The X component of the MRotation that is to be used to set this matrix.
+	 * @param MRotationY The Y component of the MRotation that is to be used to set this matrix.
+	 * @param MRotationZ The Z component of the MRotation that is to be used to set this matrix.
+	 * @param MRotationW The W component of the MRotation that is to be used to set this matrix.
 	 * @param scaleX The X component of the scaling that is to be used to set this matrix.
 	 * @param scaleY The Y component of the scaling that is to be used to set this matrix.
 	 * @param scaleZ The Z component of the scaling that is to be used to set this matrix.
 	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix4d set (double translationX, double translationY, double translationZ, double quaternionX, double quaternionY,
-			double quaternionZ, double quaternionW, double scaleX, double scaleY, double scaleZ) {
-		final double xs = quaternionX * 2d, ys = quaternionY * 2d, zs = quaternionZ * 2d;
-		final double wx = quaternionW * xs, wy = quaternionW * ys, wz = quaternionW * zs;
-		final double xx = quaternionX * xs, xy = quaternionX * ys, xz = quaternionX * zs;
-		final double yy = quaternionY * ys, yz = quaternionY * zs, zz = quaternionZ * zs;
+	public Matrix4d set (double translationX, double translationY, double translationZ, double MRotationX, double MRotationY,
+			double MRotationZ, double MRotationW, double scaleX, double scaleY, double scaleZ) {
+		final double xs = MRotationX * 2d, ys = MRotationY * 2d, zs = MRotationZ * 2d;
+		final double wx = MRotationW * xs, wy = MRotationW * ys, wz = MRotationW * zs;
+		final double xx = MRotationX * xs, xy = MRotationX * ys, xz = MRotationX * zs;
+		final double yy = MRotationY * ys, yz = MRotationY * zs, zz = MRotationZ * zs;
 
 		val[M00] = scaleX * (1.0d - (yy + zz));
 		val[M01] = scaleY * (xy - wz);
@@ -800,95 +805,7 @@ public class Matrix4d implements Serializable {
 		return this;
 	}
 
-	static Quaternion quat = new Quaternion();
-	static Quaternion quat2 = new Quaternion();
 
-	/** Sets the matrix to a rotation matrix around the given axis.
-	 * 
-	 * @param axis The axis
-	 * @param degrees The angle in degrees
-	 * @return This matrix for the purpose of chaining methods together. */
-	public <V extends Vec3d<?>> Matrix4d setToRotation (V axis, double degrees) {
-		if (degrees == 0) {
-			idt();
-			return this;
-		}
-		return set(quat.set(axis, degrees));
-	}
-
-	/** Sets the matrix to a rotation matrix around the given axis.
-	 * 
-	 * @param axis The axis
-	 * @param radians The angle in radians
-	 * @return This matrix for the purpose of chaining methods together. */
-	public <V extends Vec3d<?>> Matrix4d setToRotationRad (V axis, double radians) {
-		if (radians == 0) {
-			idt();
-			return this;
-		}
-		return set(quat.setFromAxisRad(axis, radians));
-	}
-
-	/** Sets the matrix to a rotation matrix around the given axis.
-	 * 
-	 * @param axisX The x-component of the axis
-	 * @param axisY The y-component of the axis
-	 * @param axisZ The z-component of the axis
-	 * @param radians The angle in radians
-	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix4d setToRotation (double axisX, double axisY, double axisZ, double radians) {
-		if (radians == 0) {
-			idt();
-			return this;
-		}
-		return set(quat.setFromAxisRad(axisX, axisY, axisZ, radians));
-	}
-
-	/** Sets the matrix to a rotation matrix around the given axis.
-	 * 
-	 * @param axisX The x-component of the axis
-	 * @param axisY The y-component of the axis
-	 * @param axisZ The z-component of the axis
-	 * @param radians The angle in radians
-	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix4d setToRotationRad (double axisX, double axisY, double axisZ, double radians) {
-		if (radians == 0) {
-			idt();
-			return this;
-		}
-		return set(quat.setFromAxisRad(axisX, axisY, axisZ, radians));
-	}
-
-	/** Set the matrix to a rotation matrix between two vectors.
-	 * @param v1 The base vector
-	 * @param v2 The target vector
-	 * @return This matrix for the purpose of chaining methods together */
-	public <V extends Vec3d<?>>  Matrix4d setToRotation (final V v1, final V v2) {
-		return set(quat.setFromCross(v1, v2));
-	}
-
-	/** Set the matrix to a rotation matrix between two vectors.
-	 * @param x1 The base vectors x value
-	 * @param y1 The base vectors y value
-	 * @param z1 The base vectors z value
-	 * @param x2 The target vector x value
-	 * @param y2 The target vector y value
-	 * @param z2 The target vector z value
-	 * @return This matrix for the purpose of chaining methods together */
-	public Matrix4d setToRotation (final double x1, final double y1, final double z1, final double x2, final double y2, final double z2) {
-		return set(quat.setFromCross(x1, y1, z1, x2, y2, z2));
-	}
-
-
-	/** Sets this matrix to a rotation matrix from the given euler angles.
-	 * @param yaw the yaw in radians
-	 * @param pitch the pitch in radians
-	 * @param roll the roll in radians
-	 * @return This matrix */
-	public Matrix4d setFromEulerAnglesRad (double yaw, double pitch, double roll) {
-		quat.setEulerAnglesRad(yaw, pitch, roll);
-		return set(quat);
-	}
 
 	/** Sets this matrix to a scaling matrix
 	 * 
@@ -991,79 +908,8 @@ public class Matrix4d implements Serializable {
 			this.val[i] = this.val[i] * (1 - alpha) + matrix.val[i] * alpha;
 		return this;
 	}
-
-	/** Averages the given transform with this one and stores the result in this matrix. Translations and scales are lerped while
-	 * rotations are slerped.
-	 * @param other The other transform
-	 * @param w Weight of this transform; weight of the other transform is (1 - w)
-	 * @return This matrix for chaining */
-	public Matrix4d avg (Matrix4d other, double w) {
-		getScale(tmpVec);
-		other.getScale(tmpForward);
-
-		getRotation(quat);
-		other.getRotation(quat2);
-
-		getTranslation(tmpUp);
-		other.getTranslation(right);
-
-		setToScaling(tmpVec.mult(w).add(tmpForward.mult(1 - w)));
-		rotate(quat.slerp(quat2, 1 - w));
-		setTranslation(tmpUp.mult(w).add(right.mult(1 - w)));
-
-		return this;
-	}
-
-	/** Averages the given transforms and stores the result in this matrix. Translations and scales are lerped while rotations are
-	 * slerped. Does not destroy the data contained in t.
-	 * @param t List of transforms
-	 * @return This matrix for chaining */
-	public Matrix4d avg (Matrix4d[] t) {
-		final double w = 1.0d / t.length;
-
-		tmpVec.set(t[0].getScale(tmpUp).mult(w));
-		quat.set(t[0].getRotation(quat2).exp(w));
-		tmpForward.set(t[0].getTranslation(tmpUp).mult(w));
-
-		for (int i = 1; i < t.length; i++) {
-			tmpVec.add(t[i].getScale(tmpUp).mult(w));
-			quat.mul(t[i].getRotation(quat2).exp(w));
-			tmpForward.add(t[i].getTranslation(tmpUp).mult(w));
-		}
-		quat.nor();
-
-		setToScaling(tmpVec);
-		rotate(quat);
-		setTranslation(tmpForward);
-
-		return this;
-	}
-
-	/** Averages the given transforms with the given weights and stores the result in this matrix. Translations and scales are
-	 * lerped while rotations are slerped. Does not destroy the data contained in t or w; Sum of w_i must be equal to 1, or
-	 * unexpected results will occur.
-	 * @param t List of transforms
-	 * @param w List of weights
-	 * @return This matrix for chaining */
-	public Matrix4d avg (Matrix4d[] t, double[] w) {
-		tmpVec.set(t[0].getScale(tmpUp).mult(w[0]));
-		quat.set(t[0].getRotation(quat2).exp(w[0]));
-		tmpForward.set(t[0].getTranslation(tmpUp).mult(w[0]));
-
-		for (int i = 1; i < t.length; i++) {
-			tmpVec.add(t[i].getScale(tmpUp).mult(w[i]));
-			quat.mul(t[i].getRotation(quat2).exp(w[i]));
-			tmpForward.add(t[i].getTranslation(tmpUp).mult(w[i]));
-		}
-		quat.nor();
-
-		setToScaling(tmpVec);
-		rotate(quat);
-		setTranslation(tmpForward);
-
-		return this;
-	}
-
+	
+	
 	/** Sets this matrix to the given 3x3 matrix. The third column of this matrix is set to (0,0,1,0).
 	 * @param mat the matrix */
 	public Matrix4d set (Matrix3d mat) {
@@ -1116,20 +962,6 @@ public class Matrix4d implements Serializable {
 		return position;
 	}
 
-	/** Gets the rotation of this matrix.
-	 * @param rotation The {@link Quaternion} to receive the rotation
-	 * @param normalizeAxes True to normalize the axes, necessary when the matrix might also include scaling.
-	 * @return The provided {@link Quaternion} for chaining. */
-	public Quaternion getRotation (Quaternion rotation, boolean normalizeAxes) {
-		return rotation.setFromMatrix(normalizeAxes, this);
-	}
-
-	/** Gets the rotation of this matrix.
-	 * @param rotation The {@link Quaternion} to receive the rotation
-	 * @return The provided {@link Quaternion} for chaining. */
-	public Quaternion getRotation (Quaternion rotation) {
-		return rotation.setFromMatrix(this);
-	}
 
 	/** @return the squared scale factor on the X axis */
 	public double getScaleXSquared () {
@@ -1710,78 +1542,8 @@ public class Matrix4d implements Serializable {
 		tmp[M31] = 0;
 		tmp[M32] = 0;
 		tmp[M33] = 1;
-
 		mul(val, tmp);
 		return this;
-	}
-
-	/** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
-	 * glTranslate/glRotate/glScale.
-	 * 
-	 * @param axis The vector axis to rotate around.
-	 * @param degrees The angle in degrees.
-	 * @return This matrix for the purpose of chaining methods together. */
-	public <V extends Vec3d<?>> Matrix4d rotate (V axis, double degrees) {
-		if (degrees == 0) return this;
-		quat.set(axis, degrees);
-		return rotate(quat);
-	}
-
-	/** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
-	 * glTranslate/glRotate/glScale.
-	 * 
-	 * @param axis The vector axis to rotate around.
-	 * @param radians The angle in radians.
-	 * @return This matrix for the purpose of chaining methods together. */
-	public <V extends Vec3d<?>> Matrix4d rotateRad (V axis, double radians) {
-		if (radians == 0) return this;
-		quat.setFromAxisRad(axis, radians);
-		return rotate(quat);
-	}
-
-	/** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
-	 * glTranslate/glRotate/glScale
-	 * @param axisX The x-axis component of the vector to rotate around.
-	 * @param axisY The y-axis component of the vector to rotate around.
-	 * @param axisZ The z-axis component of the vector to rotate around.
-	 * @param degrees The angle in degrees
-	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix4d rotate (double axisX, double axisY, double axisZ, double degrees) {
-		if (degrees == 0) return this;
-		quat.setFromAxisRad(axisX, axisY, axisZ, degrees);
-		return rotate(quat);
-	}
-
-	/** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
-	 * glTranslate/glRotate/glScale
-	 * @param axisX The x-axis component of the vector to rotate around.
-	 * @param axisY The y-axis component of the vector to rotate around.
-	 * @param axisZ The z-axis component of the vector to rotate around.
-	 * @param radians The angle in radians
-	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix4d rotateRad (double axisX, double axisY, double axisZ, double radians) {
-		if (radians == 0) return this;
-		quat.setFromAxisRad(axisX, axisY, axisZ, radians);
-		return rotate(quat);
-	}
-
-	/** Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
-	 * glTranslate/glRotate/glScale.
-	 * 
-	 * @param rotation
-	 * @return This matrix for the purpose of chaining methods together. */
-	public Matrix4d rotate (Quaternion rotation) {
-		rotation.toMatrix(tmp);
-		mul(val, tmp);
-		return this;
-	}
-
-	/** Postmultiplies this matrix by the rotation between two vectors.
-	 * @param v1 The base vector
-	 * @param v2 The target vector
-	 * @return This matrix for the purpose of chaining methods together */
-	public <V extends Vec3d<?>> Matrix4d rotate (final V v1, final V v2) {
-		return rotate(quat.setFromCross(v1, v2));
 	}
 
 	/** Postmultiplies this matrix with a scale matrix. Postmultiplication is also used by OpenGL ES' 1.x

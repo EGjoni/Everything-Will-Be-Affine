@@ -1,17 +1,22 @@
-package sceneGraph.math.doubleV;
+package math.doubleV;
 
-import data.JSONObject;
-import data.LoadManager;
-import data.SaveManager;
+import sceneGraph.math.doubleV.AbstractAxes;
+import sceneGraph.math.doubleV.AbstractBasis;
 import sceneGraph.math.doubleV.AbstractAxes.DependencyReference;
+import sceneGraph.math.doubleV.AxisDependency;
+import sceneGraph.math.doubleV.Rot;
+import sceneGraph.math.doubleV.SGVec_3d;
+import sceneGraph.math.doubleV.Vec3d;
+import sceneGraph.math.doubleV.sgRayd;
 
 public class AffineAxes extends AbstractAxes {
 	
+	public static SGVec_3d xBase = new SGVec_3d(1,0,0);
+	public static SGVec_3d yBase = new SGVec_3d(0,1,0);
+	public static SGVec_3d zBase = new SGVec_3d(0,0,1);
 	
 	public boolean scaleDirty = false;
 	public boolean forceOrthoNormality = true;
-	private int globalChirality = RIGHT;
-	private int localChirality = RIGHT;
 	private sgRayd xTemp = new sgRayd(); 
 	private sgRayd yTemp = new sgRayd(); 
 	private sgRayd zTemp = new sgRayd();
@@ -54,6 +59,10 @@ public class AffineAxes extends AbstractAxes {
 	public AffineAxes(AffineBasis globalMBasis, boolean forceOrthoNormality, AffineAxes object) {
 		super(globalMBasis, object);
 		this.forceOrthoNormality = forceOrthoNormality;
+	}
+	
+	public <B extends AbstractBasis> B getLocalOf(B input) {
+		return (B) new AffineBasis(this.getLocalOf(input.getXRay()), this.getLocalOf(input.getYRay()), this.getLocalOf(input.getZRay()));
 	}
 
 
@@ -137,9 +146,9 @@ public class AffineAxes extends AbstractAxes {
 						true,
 						null);
 		orthoNormalizedCopy.getLocalMBasis().rotation = new Rot(this.getGlobalMBasis().rotation.rotation);
-		orthoNormalizedCopy.getLocalMBasis().setShearXBaseTo(AffineBasis.xBase.mult(getGlobalMBasis().flippedAxes[AffineBasis.X] ? -1 : 1), false);
-		orthoNormalizedCopy.getLocalMBasis().setShearYBaseTo(AffineBasis.yBase.mult(getGlobalMBasis().flippedAxes[AffineBasis.Y] ? -1 : 1), false);
-		orthoNormalizedCopy.getLocalMBasis().setShearZBaseTo(AffineBasis.zBase.mult(getGlobalMBasis().flippedAxes[AffineBasis.Z] ? -1 : 1), false);
+		orthoNormalizedCopy.getLocalMBasis().setShearXBaseTo(xBase.multCopy(getGlobalMBasis().flippedAxes[AffineBasis.X] ? -1 : 1), false);
+		orthoNormalizedCopy.getLocalMBasis().setShearYBaseTo(yBase.multCopy(getGlobalMBasis().flippedAxes[AffineBasis.Y] ? -1 : 1), false);
+		orthoNormalizedCopy.getLocalMBasis().setShearZBaseTo(zBase.multCopy(getGlobalMBasis().flippedAxes[AffineBasis.Z] ? -1 : 1), false);
 		orthoNormalizedCopy.getLocalMBasis().rotation = new Rot(this.getGlobalMBasis().rotation.rotation);
 		orthoNormalizedCopy.markDirty();
 		orthoNormalizedCopy.updateGlobal();
@@ -343,13 +352,8 @@ public class AffineAxes extends AbstractAxes {
 				/*if(this.debug) {	
 					System.out.println("Global Rotation post: \n" + getGlobalMBasis().rotation);
 				}*/
-
-				this.globalChirality = this.getGlobalMBasis().chirality;
-				this.localChirality = this.getLocalMBasis().chirality;
 			}
 		}
-		globalChirality = getGlobalMBasis().chirality;
-		localChirality = getLocalMBasis().chirality;
 		dirty = false;
 	} 
 	
@@ -395,7 +399,7 @@ public class AffineAxes extends AbstractAxes {
 	@Override
 	public AffineAxes getLocalOf(AbstractAxes input) {
 		this.updateGlobal();
-			AffineBasis newBasis = new AffineBasis();
+			AffineBasis newBasis = new AffineBasis((AffineBasis)input.getLocalMBasis());
 			this.getGlobalMBasis().setToLocalOf(input.getGlobalMBasis(), newBasis);
 			return new AffineAxes(
 				newBasis, 
@@ -631,7 +635,7 @@ public class AffineAxes extends AbstractAxes {
 	 * @return a vector representing this frame's orientational X basis vector. Guaranteed to be Right-Handed and orthonormal. 
 	 */
 
-	public SGVec_3d orientation_X_() {
+	public Vec3d<?> orientation_X_() {
 		this.updateGlobal();
 		return  this.getGlobalMBasis().getRotationalXHead();
 	}
@@ -640,7 +644,7 @@ public class AffineAxes extends AbstractAxes {
 	 * @return a vector representing this frame's orientational Y basis vector. Guaranteed to be Right-Handed and orthonormal. 
 	 */
 
-	public SGVec_3d   orientation_Y_() {
+	public Vec3d<?>   orientation_Y_() {
 		this.updateGlobal();
 		return  this.getGlobalMBasis().getRotationalYHead();
 	}
@@ -649,7 +653,7 @@ public class AffineAxes extends AbstractAxes {
 	 * @return a vector representing this frame's orientational Z basis vector. Guaranteed to be Right-Handed and orthonormal. 
 	 */
 
-	public SGVec_3d   orientation_Z_() {
+	public Vec3d<?>   orientation_Z_() {
 		this.updateGlobal();
 		return  this.getGlobalMBasis().getRotationalZHead();
 	}
@@ -658,7 +662,7 @@ public class AffineAxes extends AbstractAxes {
 	 * @return a vector representing this frame's orthonormal X basis vector. Guaranteed to be orthonormal but not necessarily right-handed. 
 	 */
 
-	public SGVec_3d   orthonormal_X_() {
+	public Vec3d<?>   orthonormal_X_() {
 		this.updateGlobal();
 		return  this.getGlobalMBasis().getOrthonormalXHead();
 	}
@@ -667,7 +671,7 @@ public class AffineAxes extends AbstractAxes {
 	/**
 	 * @return a vector representing this frame's orthonormal Y basis vector. Guaranteed to be orthonormal but not necessarily right-handed. 
 	 */
-	public SGVec_3d   orthonormal_Y_() {
+	public Vec3d<?>   orthonormal_Y_() {
 		this.updateGlobal();
 		return  this.getGlobalMBasis().getOrthonormalYHead();
 	}
@@ -675,7 +679,7 @@ public class AffineAxes extends AbstractAxes {
 	/**
 	 * @return a vector representing this frame's orthonormal Z basis vector. Guaranteed to be orthonormal but not necessarily right-handed. 
 	 */
-	public SGVec_3d   orthonormal_Z_() {
+	public Vec3d<?>   orthonormal_Z_() {
 		this.updateGlobal();
 		return  this.getGlobalMBasis().getOrthonormalZHead();
 	}
@@ -687,16 +691,7 @@ public class AffineAxes extends AbstractAxes {
 		return result;
 	}
 	
-	public int getGlobalChirality() {
-		this.updateGlobal();
-		return this.globalChirality;
-	}
-
-	public int getLocalChirality() {
-		this.updateGlobal();
-		return this.localChirality;
-	}	
-	
+		
 	public void rotateAboutX(double angle, boolean orthonormalized) {
 		this.updateGlobal();
 		Rot xRot = new Rot(getGlobalMBasis().getOrthonormalXHead(), angle);		
@@ -786,37 +781,18 @@ public class AffineAxes extends AbstractAxes {
 			this.updateGlobal();
 		}
 	}
-	
-	@Override
-	public JSONObject getSaveJSON(SaveManager saveManager) {
-		JSONObject thisAxes = super.getSaveJSON(saveManager);
-		thisAxes.setBoolean("forceOrthoNormality", this.forceOrthoNormality);
-		return thisAxes;
-	}
-
-	
-	@Override
-	public void loadFromJSONObject(JSONObject j, LoadManager l) {
-		SGVec_3d x = new SGVec_3d(j.getJSONObject("bases").getJSONArray("x"));
-		SGVec_3d y = new SGVec_3d(j.getJSONObject("bases").getJSONArray("y"));
-		SGVec_3d z =  new SGVec_3d(j.getJSONObject("bases").getJSONArray("z"));
 		
-		this.forceOrthoNormality = j.getBoolean("forceOrthoNormality");
-		this.getLocalMBasis().setShearXBaseTo(x, false);
-		this.getLocalMBasis().setShearYBaseTo(y, false);
-		this.getLocalMBasis().setShearZBaseTo(z, false);
-		super.loadFromJSONObject(j,l);
-	}
-
-	
+	@Override
 	public AffineBasis getGlobalMBasis() {
 		return (AffineBasis)globalMBasis;
 	}
 	
+	@Override
 	public AffineBasis getLocalMBasis() {
 		return (AffineBasis)localMBasis;
 	}
 	
+	@Override
 	public AffineAxes getParentAxes() {
 		return (AffineAxes)super.getParentAxes();
 	}

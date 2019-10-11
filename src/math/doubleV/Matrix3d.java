@@ -14,9 +14,11 @@
  * limitations under the License.
  ******************************************************************************/
 
-package sceneGraph.math.doubleV;
+package math.doubleV;
 
 import java.io.Serializable;
+
+import sceneGraph.math.doubleV.SGVec_3d;
 
 
 /** A 3x3 <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> matrix; useful for 2D
@@ -165,21 +167,6 @@ public class Matrix3d implements Serializable {
 
 
 
-	public Matrix3d setToRotation (SGVec_3d axis, double cos, double sin) {
-		double[] val = this.val;
-		double oc = 1.0f - cos;
-		val[M00] = oc * axis.x * axis.x + cos;
-		val[M10] = oc * axis.x * axis.y - axis.z * sin;
-		val[M20] = oc * axis.z * axis.x + axis.y * sin;
-		val[M01] = oc * axis.x * axis.y + axis.z * sin;
-		val[M11] = oc * axis.y * axis.y + cos;
-		val[M21] = oc * axis.y * axis.z - axis.x * sin;
-		val[M02] = oc * axis.z * axis.x - axis.y * sin;
-		val[M12] = oc * axis.y * axis.z + axis.x * sin;
-		val[M22] = oc * axis.z * axis.z + cos;
-		return this;
-	}
-
 	/** Sets this matrix to a translation matrix.
 	 * @param x the translation in x
 	 * @param y the translation in y
@@ -202,26 +189,6 @@ public class Matrix3d implements Serializable {
 		return this;
 	}
 
-	/** Sets this matrix to a translation matrix.
-	 * @param translation The translation vector.
-	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d setToTranslation (SGVec_2d translation) {
-		double[] val = this.val;
-
-		val[M00] = 1;
-		val[M10] = 0;
-		val[M20] = 0;
-
-		val[M01] = 0;
-		val[M11] = 1;
-		val[M21] = 0;
-
-		val[M02] = translation.x;
-		val[M12] = translation.y;
-		val[M22] = 1;
-
-		return this;
-	}
 
 	/** Sets this matrix to a scaling matrix.
 	 * 
@@ -242,22 +209,6 @@ public class Matrix3d implements Serializable {
 		return this;
 	}
 
-	/** Sets this matrix to a scaling matrix.
-	 * @param scale The scale vector.
-	 * @return This matrix for the purpose of chaining operations. */
-	public Matrix3d setToScaling (SGVec_2d scale) {
-		double[] val = this.val;
-		val[M00] = scale.x;
-		val[M10] = 0;
-		val[M20] = 0;
-		val[M01] = 0;
-		val[M11] = scale.y;
-		val[M21] = 0;
-		val[M02] = 0;
-		val[M12] = 0;
-		val[M22] = 1;
-		return this;
-	}
 
 	public String toString () {
 		double[] val = this.val;

@@ -1,7 +1,6 @@
-package sceneGraph.math.doubleV;
+package math.doubleV;
 
-import sceneGraph.IKVector;
-import sceneGraph.math.floatV.SGVec_2f;
+import sceneGraph.math.doubleV.Vecd;
 import sceneGraph.math.floatV.Vec2f;
 import sceneGraph.math.floatV.Vec3f;
 

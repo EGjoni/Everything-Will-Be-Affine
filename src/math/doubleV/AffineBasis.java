@@ -1,7 +1,12 @@
-package sceneGraph.math.doubleV;
+package math.doubleV;
 
 
 
+import sceneGraph.math.doubleV.AbstractBasis;
+import sceneGraph.math.doubleV.Rot;
+import sceneGraph.math.doubleV.SGVec_3d;
+import sceneGraph.math.doubleV.Vec3d;
+import sceneGraph.math.doubleV.sgRayd;
 import sceneGraph.math.floatV.Vec3f;
 
 public class AffineBasis extends AbstractBasis {
@@ -30,10 +35,7 @@ public class AffineBasis extends AbstractBasis {
 	//public boolean forceOrthonormal = false;
 	public Vec3d<?> scale;
 
-	public static final int NONE = -1;
-	public static final int X = 0;
-	public static final int Y = 1;
-	public static final int Z = 2;
+	
 
 	public boolean[] flippedAxes = new boolean[3];
 	public Matrix4d reflectionMatrix = new Matrix4d();
@@ -77,7 +79,7 @@ public class AffineBasis extends AbstractBasis {
 	 * @param z the z ray. it's p1 value is ignored for any purpose other than determining direction.
 	 */
 	public AffineBasis(sgRayd x, sgRayd y, sgRayd z) {
-		super(x.p1);
+		super(x.p1());
 		this.shearScaleMatrix.idt();
 		this.translate.set((SGVec_3d) x.p1().copy());
 
@@ -112,6 +114,7 @@ public class AffineBasis extends AbstractBasis {
 		setShearZBaseTo(zDirNew, true);
 
 	}
+	
 
 	public AffineBasis(Vec3d<?> origin) {
 		super(origin);
@@ -187,31 +190,32 @@ public class AffineBasis extends AbstractBasis {
 	 * @param input
 	 */
 
-	public void setToLocalOf(AffineBasis global_input, AffineBasis local_output) {
+	@Override
+	public <B extends AbstractBasis> void setToLocalOf(B global_input, B local_output) {
 
 		///if a matrix is inverted, reflection should be computed by Reflection *Matrix. 
 		//if a matrix is NOT inverted, reflection should be computed by Matrix * Reflection.	
 
 		this.rotation.applyInverseTo(global_input.rotation, local_output.rotation); 
-		local_output.composedMatrix.setToMulOf(this.getInverseComposedMatrix(), global_input.composedMatrix);
+		((AffineBasis)local_output).composedMatrix.setToMulOf(this.getInverseComposedMatrix(), ((AffineBasis)global_input).composedMatrix);
 		this.setToChiralityModifiedRotationOf(local_output.rotation, local_output.rotation);
 		//local_output.rotation.set(currentRot);
 		//Rot postModRot = this.rotation.applyTo(currentRot);
 
-		local_output.composedMatrix.getColumn(X, arrVec1);		
+		((AffineBasis)local_output).composedMatrix.getColumn(X, arrVec1);		
 		local_output.rotation.rotation.applyInverseTo(arrVec1, arrVec2);
 		SGVec_3d arrV = new SGVec_3d(); arrV.set(arrVec2);
 		//arrV.add(this.translate);
 		//SGVec_3d orthonormalVer = new SGVec_3d();  this.setToOrthoNormalLocalOf(arrV, orthonormalVer);
-		local_output.shearScaleMatrix.setColumn(X, arrVec2);	
+		((AffineBasis)local_output).shearScaleMatrix.setColumn(X, arrVec2);	
 
-		local_output.composedMatrix.getColumn(Y, arrVec1);		
+		((AffineBasis)local_output).composedMatrix.getColumn(Y, arrVec1);		
 		local_output.rotation.rotation.applyInverseTo(arrVec1, arrVec2);
-		local_output.shearScaleMatrix.setColumn(Y, arrVec2);
+		((AffineBasis)local_output).shearScaleMatrix.setColumn(Y, arrVec2);
 
-		local_output.composedMatrix.getColumn(Z, arrVec1);		
+		((AffineBasis)local_output).composedMatrix.getColumn(Z, arrVec1);		
 		local_output.rotation.rotation.applyInverseTo(arrVec1, arrVec2);
-		local_output.shearScaleMatrix.setColumn(Z, arrVec2);
+		((AffineBasis)local_output).shearScaleMatrix.setColumn(Z, arrVec2);
 		//tempMatrix.mul(this.reflectionMatrix, global_input.reflectionMatrix);
 		//local_output.shearScaleMatrix.mul(local_output.shearScaleMatrix, tempMatrix);		
 		local_output.translate = this.getLocalOf(global_input.translate);
@@ -752,9 +756,6 @@ public class AffineBasis extends AbstractBasis {
 	else flippedAxes[Z] = false;*/
 
 	}
-
-
-	Quaternion tempQuat = new Quaternion();
 	public void refreshPrecomputed() {
 
 		//this.shearScaleTransform.set(shearScaleMatrix);
@@ -905,9 +906,9 @@ public class AffineBasis extends AbstractBasis {
 		this.scaledZHeading = zBase.copy();
 		this.rotation = new Rot();
 		this.translate.x = 0; this.translate.y = 0; this.translate.z = 0;
-		this.xRay.p1.set(this.translate); this.xRay.p1(xBase);
-		this.yRay.p1.set(this.translate); this.yRay.p1(yBase); 
-		this.zRay.p1.set(this.translate); this.zRay.p1(zBase);
+		this.xRay.p1(this.translate); this.xRay.p2(xBase);
+		this.yRay.p1(this.translate); this.yRay.p2(yBase); 
+		this.zRay.p1(this.translate); this.zRay.p2(zBase);
 		this.composedMatrix.idt();
 		this.shearScaleMatrix.idt();
 		refreshPrecomputed();
