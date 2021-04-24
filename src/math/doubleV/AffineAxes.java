@@ -1,13 +1,14 @@
 package math.doubleV;
 
-import sceneGraph.math.doubleV.AbstractAxes;
-import sceneGraph.math.doubleV.AbstractBasis;
-import sceneGraph.math.doubleV.AbstractAxes.DependencyReference;
-import sceneGraph.math.doubleV.AxisDependency;
-import sceneGraph.math.doubleV.Rot;
-import sceneGraph.math.doubleV.SGVec_3d;
-import sceneGraph.math.doubleV.Vec3d;
-import sceneGraph.math.doubleV.sgRayd;
+import GiftedApprentice_JME.DVector;
+import math.doubleV.AbstractAxes;
+import math.doubleV.AbstractBasis;
+import math.doubleV.AbstractAxes.DependencyReference;
+import math.doubleV.AxisDependency;
+import math.doubleV.Rot;
+import math.doubleV.SGVec_3d;
+import math.doubleV.Vec3d;
+import math.doubleV.sgRayd;
 
 public class AffineAxes extends AbstractAxes {
 	
@@ -58,6 +59,9 @@ public class AffineAxes extends AbstractAxes {
 
 	public AffineAxes(AffineBasis globalMBasis, boolean forceOrthoNormality, AffineAxes object) {
 		super(globalMBasis, object);
+		 xTemp = new sgRayd(new DVector(), new DVector()); 
+		 yTemp = new sgRayd(new DVector(), new DVector()); 
+		 zTemp = new sgRayd(new DVector(), new DVector());
 		this.forceOrthoNormality = forceOrthoNormality;
 	}
 	

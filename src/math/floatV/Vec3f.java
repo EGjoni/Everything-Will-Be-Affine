@@ -1,12 +1,12 @@
-package sceneGraph.math.floatV;
+package math.floatV;
 
 import data.CanLoad;
-import data.JSONArray;
-import data.JSONObject;
-import sceneGraph.IKVector;
-import sceneGraph.math.doubleV.Vec3d;
-import sceneGraph.math.floatV.SGVec_3f;
-import sceneGraph.math.floatV.Vec3f;
+import asj.data.JSONArray;
+import asj.data.JSONObject;
+import IKVector;
+import math.doubleV.Vec3d;
+import math.floatV.SGVec_3f;
+import math.floatV.Vec3f;
 
 public interface Vec3f<T extends Vec3f<T>> extends Vecf<T> {
 		

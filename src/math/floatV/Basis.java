@@ -1,8 +1,8 @@
-package sceneGraph.math.floatV;
+package math.floatV;
 
 
 
-import sceneGraph.math.floatV.Vec3f;
+import math.floatV.Vec3f;
 
 public class Basis {
 

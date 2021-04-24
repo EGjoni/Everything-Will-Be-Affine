@@ -8,10 +8,10 @@ import data.CanLoad;
 //import processing.core.PVector;
 import data.JSONArray;
 import data.JSONObject;
-import sceneGraph.math.floatV.SGVec_2f;
-import sceneGraph.math.floatV.SGVec_3f;
-import sceneGraph.math.doubleV.SGVec_3d;
-import sceneGraph.math.doubleV.Vec3d;
+import math.floatV.SGVec_2f;
+import math.floatV.SGVec_3f;
+import math.doubleV.SGVec_3d;
+import math.doubleV.Vec3d;
 
 
 

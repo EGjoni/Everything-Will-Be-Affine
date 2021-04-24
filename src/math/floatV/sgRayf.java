@@ -18,11 +18,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 
-package sceneGraph.math.floatV;
+package math.floatV;
 
-import data.JSONObject;
-import sceneGraph.math.doubleV.SGVec_3d;
-import sceneGraph.math.floatV.SGVec_3f;
+import asj.data.JSONObject;
+import math.doubleV.SGVec_3d;
+import math.floatV.SGVec_3f;
 
 /**
  * @author Eron Gjoni

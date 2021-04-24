@@ -1,6 +1,6 @@
-package sceneGraph.math.floatV;
+package math.floatV;
 
-import sceneGraph.IKVector;
+import IKVector;
 
 public final class RotationOrder {
 	

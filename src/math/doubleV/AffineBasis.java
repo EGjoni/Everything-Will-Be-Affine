@@ -2,12 +2,12 @@ package math.doubleV;
 
 
 
-import sceneGraph.math.doubleV.AbstractBasis;
-import sceneGraph.math.doubleV.Rot;
-import sceneGraph.math.doubleV.SGVec_3d;
-import sceneGraph.math.doubleV.Vec3d;
-import sceneGraph.math.doubleV.sgRayd;
-import sceneGraph.math.floatV.Vec3f;
+import math.doubleV.AbstractBasis;
+import math.doubleV.Rot;
+import math.doubleV.SGVec_3d;
+import math.doubleV.Vec3d;
+import math.doubleV.sgRayd;
+import math.floatV.Vec3f;
 
 public class AffineBasis extends AbstractBasis {
 
@@ -37,9 +37,9 @@ public class AffineBasis extends AbstractBasis {
 
 	
 
-	public boolean[] flippedAxes = new boolean[3];
-	public Matrix4d reflectionMatrix = new Matrix4d();
-	public Matrix4d inverseReflectionMatrix = new Matrix4d();
+	public boolean[] flippedAxes;// = new boolean[3];
+	public Matrix4d reflectionMatrix;// = new Matrix4d();
+	public Matrix4d inverseReflectionMatrix;// = new Matrix4d();
 
 	protected int chirality = RIGHT;
 
@@ -49,15 +49,25 @@ public class AffineBasis extends AbstractBasis {
 
 	//private Transform3D inverseComposedTransform = new Transform3D();
 
-	private Matrix4d composedMatrix = new Matrix4d(); 
-	private Matrix4d inverseComposedMatrix = new Matrix4d();
-	private Matrix4d shearScaleMatrix = new Matrix4d(); 
+	private Matrix4d composedMatrix; 
+	private Matrix4d inverseComposedMatrix;
+	private Matrix4d shearScaleMatrix; 
+	
+	public Matrix4d composedOrthoNormalMatrix;
+	private Matrix4d inverseComposedOrthoNormalMatrix;
 
 
 	private boolean reflectionInversesDirty = true;
 	private boolean composedInversesDirty = true;
 	private boolean orthoNormalInversesDirty = true;
 	//Matrix4d tempMat = new Matrix4d();
+	
+	double [] arrVec1 = new double[4];
+	double [] arrVec2 = new double[4];
+
+
+
+	private boolean initialized = false;
 
 	/**
 	 * A basis is a collection of linearly independent rays + their origin. 
@@ -82,6 +92,8 @@ public class AffineBasis extends AbstractBasis {
 		super(x.p1());
 		this.shearScaleMatrix.idt();
 		this.translate.set((SGVec_3d) x.p1().copy());
+		arrVec1 = new double[4];
+		arrVec2 = new double[4];
 
 		scale = translate.copy(); 
 		this.scale.x = x.mag();
@@ -90,7 +102,7 @@ public class AffineBasis extends AbstractBasis {
 		this.scaledXHeading = xBase.copy();
 		this.scaledYHeading = yBase.copy(); 
 		this.scaledZHeading = zBase.copy();
-
+		
 		SGVec_3d xDirNew =new SGVec_3d((SGVec_3d) x.heading());
 		SGVec_3d yDirNew =new SGVec_3d((SGVec_3d) y.heading()); 
 		SGVec_3d zDirNew = new SGVec_3d((SGVec_3d) z.heading());   		
@@ -118,6 +130,8 @@ public class AffineBasis extends AbstractBasis {
 
 	public AffineBasis(Vec3d<?> origin) {
 		super(origin);
+		arrVec1 = new double[4];
+		arrVec2 = new double[4];
 		scale = translate.copy(); 
 		this.scale.set(1,1,1);
 		this.rotation = new Rot();
@@ -141,8 +155,30 @@ public class AffineBasis extends AbstractBasis {
 
 	public AffineBasis(AffineBasis input) {
 		super(input.translate);
+		arrVec1 = new double[4];
+		arrVec2 = new double[4];
 		scale = translate.copy(); 
 		this.adoptValues(input);
+	}
+	
+	public void init() {
+		this.scaledXHeading = xBase.copy();
+		this.scaledYHeading = yBase.copy(); 
+		this.scaledZHeading = zBase.copy();
+		arrVec1 = new double[4];
+		arrVec2 = new double[4];
+		composedMatrix = new Matrix4d(); 
+		inverseComposedMatrix = new Matrix4d();
+		 shearScaleMatrix = new Matrix4d(); 
+		flippedAxes = new boolean[3];
+		reflectionMatrix = new Matrix4d();
+		inverseReflectionMatrix = new Matrix4d();
+		reflectionInversesDirty = true;
+		composedInversesDirty = true;
+		orthoNormalInversesDirty = true;
+		composedOrthoNormalMatrix = new Matrix4d();
+		inverseComposedOrthoNormalMatrix = new Matrix4d();
+		 this.initialized = true;
 	}
 
 	/**
@@ -246,11 +282,12 @@ public class AffineBasis extends AbstractBasis {
 	 * @param localInput
 	 * @param globalOutput
 	 */
-	public void setToGlobalOf(AffineBasis localInput, AffineBasis globalOutput) {		
+	@Override
+	public <B extends AbstractBasis>  void setToGlobalOf(B localInput, B globalOutput) {		
 		this.setToGlobalOf(localInput.translate, globalOutput.translate);
-		tempMatrix.setToMulOf(this.shearScaleMatrix, localInput.composedMatrix);		
+		tempMatrix.setToMulOf(this.shearScaleMatrix, ((AffineBasis)localInput).composedMatrix);		
 		setToChiralityModifiedRotationOf(localInput.rotation, globalOutput.rotation);
-		applyInverseRotTo(globalOutput.rotation, tempMatrix, globalOutput.shearScaleMatrix);
+		applyInverseRotTo(globalOutput.rotation, tempMatrix, ((AffineBasis)globalOutput).shearScaleMatrix);
 		this.rotation.applyTo(globalOutput.rotation, globalOutput.rotation);
 		globalOutput.refreshPrecomputed();
 	}
@@ -262,8 +299,7 @@ public class AffineBasis extends AbstractBasis {
 			this.getInverseComposedOrthoNormalMatrix().transform(tempV, tempV);		
 			return new Rot(tempV, inRot.getAngle()*this.chirality);		
 	}
-	public Matrix4d composedOrthoNormalMatrix = new Matrix4d();
-	private Matrix4d inverseComposedOrthoNormalMatrix = new Matrix4d();
+	
 
 
 	private void setToChiralityModifiedRotationOf(Rot localRot, Rot outputRot) {
@@ -365,7 +401,7 @@ public class AffineBasis extends AbstractBasis {
 	}
 
 	public <V extends Vec3d<?>> void setToGlobalOf(V input, V output) {
-		V tempV = (V) output.copy();
+		V tempV = (V) input.copy();
 		this.composedMatrix.transform(tempV, tempV);		
 		output.set(tempV);
 		output.add(this.translate); 	
@@ -449,13 +485,13 @@ public class AffineBasis extends AbstractBasis {
 	public String toString() {
 		SGVec_3d tempV = new SGVec_3d();
 		setToComposedXBase(tempV);
-		Vec3f xh = tempV.toVec3f();
+		Vec3f xh = (Vec3f) tempV.toVec3f();
 
 		setToComposedYBase(tempV);
-		Vec3f yh = tempV.toVec3f();
+		Vec3f yh = (Vec3f) tempV.toVec3f();
 
 		setToComposedZBase(tempV);
-		Vec3f zh = tempV.toVec3f();
+		Vec3f zh = (Vec3f) tempV.toVec3f();
 
 		float xMag = xh.mag();	
 		float yMag = yh.mag();
@@ -756,9 +792,10 @@ public class AffineBasis extends AbstractBasis {
 	else flippedAxes[Z] = false;*/
 
 	}
+	
 	public void refreshPrecomputed() {
-
 		//this.shearScaleTransform.set(shearScaleMatrix);
+		if(!this.initialized) this.init();
 		applyRotTo(this.rotation, this.shearScaleMatrix, this.composedMatrix);
 		//this.composedTransform.set(composedMatrix);
 		//int oldDeterminant = this.chirality;
@@ -813,8 +850,7 @@ public class AffineBasis extends AbstractBasis {
 		outputMatrix.val[M33] = 1;
 	}
 
-	double [] arrVec1 = new double[4];
-	double [] arrVec2 = new double[4];
+	
 
 	private void updateChirality() {
 		setFlipArrayForMatrix(this.composedMatrix, this.flippedAxes, this.rotation);

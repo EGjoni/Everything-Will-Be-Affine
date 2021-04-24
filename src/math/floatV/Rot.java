@@ -17,14 +17,14 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
  */
 
-package sceneGraph.math.floatV;
+package math.floatV;
 //import org.apache.commons.math3.geometry.euclidean.threed.*;
 
 
-import data.JSONArray;
-import sceneGraph.math.floatV.SGVec_3f;
-import sceneGraph.numerical.Precision.MathArithmeticException;
-import sceneGraph.numerical.Precision.MathIllegalArgumentException;
+import asj.data.JSONArray;
+import math.floatV.SGVec_3f;
+import numerical.Precision.MathArithmeticException;
+import numerical.Precision.MathIllegalArgumentException;
 
 public class Rot {
 	public MRotation rotation; 

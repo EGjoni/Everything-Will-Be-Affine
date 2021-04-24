@@ -1,9 +1,9 @@
-package sceneGraph.math.floatV;
+package math.floatV;
 
-import sceneGraph.IKVector;
-import sceneGraph.math.floatV.SGVec_2f;
-import sceneGraph.math.floatV.Vec2f;
-import sceneGraph.math.floatV.Vec3f;
+import IKVector;
+import math.floatV.SGVec_2f;
+import math.floatV.Vec2f;
+import math.floatV.Vec3f;
 
 public interface Vec2f<T extends Vec2f<T>> extends Vecf<T>{
 	

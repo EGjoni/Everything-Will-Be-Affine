@@ -18,10 +18,10 @@ package math.doubleV;
 
 import java.io.Serializable;
 
-import sceneGraph.math.doubleV.MRotation;
-import sceneGraph.math.doubleV.MathUtils;
-import sceneGraph.math.doubleV.SGVec_3d;
-import sceneGraph.math.doubleV.Vec3d;
+import math.doubleV.MRotation;
+import math.doubleV.MathUtils;
+import math.doubleV.SGVec_3d;
+import math.doubleV.Vec3d;
 
 /** Encapsulates a <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> 4 by 4 matrix. Like
  * the {@link SGVec_3d} class it allows the chaining of methods by returning a reference to itself. For example:

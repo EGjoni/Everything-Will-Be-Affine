@@ -3,13 +3,13 @@
  * but it is mutable. It is licensed under the Apache Commons License.
  */
 
-package sceneGraph.math.floatV;
+package math.floatV;
 
 
 
-import sceneGraph.math.floatV.SGVec_3f;
-import sceneGraph.numerical.Precision;
-import sceneGraph.numerical.Precision.*;
+import math.floatV.SGVec_3f;
+import numerical.Precision;
+import numerical.Precision.*;
 
 
 

@@ -1,11 +1,11 @@
-package sceneGraph.math.floatV;
+package math.floatV;
 
-import sceneGraph.math.floatV.MRotation;
-import sceneGraph.math.floatV.MathUtils;
-import sceneGraph.math.floatV.Matrix3f;
-import sceneGraph.math.floatV.Matrix4f;
-import sceneGraph.math.floatV.Rot;
-import sceneGraph.math.floatV.SGVec_3f;
+import math.floatV.MRotation;
+import math.floatV.MathUtils;
+import math.floatV.Matrix3f;
+import math.floatV.Matrix4f;
+import math.floatV.Rot;
+import math.floatV.SGVec_3f;
 
 public class QCP {
 

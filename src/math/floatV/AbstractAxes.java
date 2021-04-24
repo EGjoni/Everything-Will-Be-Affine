@@ -17,19 +17,18 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
  */
 
-package sceneGraph.math.floatV;
+package math.floatV;
 
 
 import java.util.ArrayList;
 
-import IK.floatIK.G;
-import data.JSONObject;
-import data.LoadManager;
-import data.SaveManager;
-import data.Saveable;
-import sceneGraph.math.floatV.AbstractAxes;
-import sceneGraph.math.floatV.Rot;
-import sceneGraph.math.floatV.SGVec_3f;
+import asj.data.JSONObject;
+import asj.LoadManager;
+import asj.SaveManager;
+import asj.Saveable;
+import math.floatV.AbstractAxes;
+import math.floatV.Rot;
+import math.floatV.SGVec_3f;
 
 /**
  * @author Eron Gjoni

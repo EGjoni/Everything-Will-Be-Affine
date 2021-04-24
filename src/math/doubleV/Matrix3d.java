@@ -18,7 +18,7 @@ package math.doubleV;
 
 import java.io.Serializable;
 
-import sceneGraph.math.doubleV.SGVec_3d;
+import math.doubleV.SGVec_3d;
 
 
 /** A 3x3 <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> matrix; useful for 2D
@@ -450,7 +450,7 @@ public class Matrix3d implements Serializable {
 	public SGVec_3d col(int column) {
 		double[] vecarr = new double[3]; 
 		getColumn(column, vecarr);
-		return new SGVec_3d(vecarr);
+		return new SGVec_3d(vecarr[0], vecarr[1], vecarr[2]);
 	}
 	
 	/**

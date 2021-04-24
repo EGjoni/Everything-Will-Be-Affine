@@ -18,8 +18,7 @@ package math.doubleV;
 
 import java.io.Serializable;
 
-import sceneGraph.math.floatV.SGVec_2f;
-import sceneGraph.math.floatV.Vec2f;
+import math.floatV.Vec3f;
 
 //import com.badlogic.gdx.utils.GdxRuntimeException;
 //import com.badlogic.gdx.utils.NumberUtils;
@@ -145,10 +144,10 @@ public class SGVec_2d implements Serializable, Vec2d<SGVec_2d> {
 		return x1 * x2 + y1 * y2;
 	}
 
-	@Override
+	/*@Override
 	public double dot (SGVec_2d v) {
 		return x * v.x + y * v.y;
-	}
+	}*/
 
 	public double dot (double ox, double oy) {
 		return x * ox + y * oy;
@@ -176,12 +175,12 @@ public class SGVec_2d implements Serializable, Vec2d<SGVec_2d> {
 		return this;
 	}
 
-	@Override
+	/*@Override
 	public SGVec_2d mulAdd (SGVec_2d vec, double scalar) {
 		this.x += vec.x * scalar;
 		this.y += vec.y * scalar;
 		return this;
-	}
+	}*/
 
 	@Override
 	public SGVec_2d mulAdd (SGVec_2d vec, SGVec_2d mulVec) {
@@ -364,10 +363,10 @@ public class SGVec_2d implements Serializable, Vec2d<SGVec_2d> {
 		return this;
 	}
 
-	@Override
+	/*@Override
 	public SGVec_2d interpolate (SGVec_2d target, double alpha, Interpolation interpolation) {
 		return lerp(target, interpolation.apply(alpha));
-	}
+	}*/
 
 /*	@Override
 	public Vector2 setToRandomDirection () {
@@ -395,13 +394,13 @@ public class SGVec_2d implements Serializable, Vec2d<SGVec_2d> {
 		return true;
 	}*/
 
-	@Override
+	/*@Override
 	public boolean epsilonEquals (SGVec_2d other, double epsilon) {
 		if (other == null) return false;
 		if (Math.abs(other.x - x) > epsilon) return false;
 		if (Math.abs(other.y - y) > epsilon) return false;
 		return true;
-	}
+	}*/
 
 	/** Compares this vector with the other vector, using the supplied epsilon for fuzzy equality testing.
 	 * @return whether the vectors are the same. */
@@ -509,9 +508,9 @@ public class SGVec_2d implements Serializable, Vec2d<SGVec_2d> {
 		this.y = y;
 	}
 
-	public SGVec_2f toSGVec2f() {
+	/*public SGVec_2f toSGVec2f() {
 		return new SGVec_2f((float)x,(float) y);
-	}
+	}*/
 
 	@Override
 	public SGVec_2d div(double n) {
@@ -525,6 +524,102 @@ public class SGVec_2d implements Serializable, Vec2d<SGVec_2d> {
 		this.x = v[0];
 		this.y = v[1];		
 		return this;
+	}
+
+	@Override
+	public <V extends Vecd<?>> double dot(V v) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public <V extends Vecd<?>> boolean epsilonEquals(V other, double epsilon) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public <V extends Vecd<?>> SGVec_2d mulAdd(V v, double scalar) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <V extends Vecd<?>> SGVec_2d mulAdd(V v, V mulVec) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SGVec_2d set(double x, double y, double z) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SGVec_2d add(double x, double y, double z) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SGVec_2d add(double[] v) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double getX() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getY() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getZ() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public <V extends Vec3f<?>> V toVec3f() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <V extends Vecd<?>> SGVec_2d crs(V vector) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <V extends Vecd<?>> SGVec_2d add(V v) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <V extends Vec3f<?>> SGVec_2d add(V v) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <V extends Vecd<?>> SGVec_2d sub(V v) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <V extends Vecd<?>> SGVec_2d mult(V v) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

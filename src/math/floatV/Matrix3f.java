@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package sceneGraph.math.floatV;
+package math.floatV;
 
 import java.io.Serializable;
 
