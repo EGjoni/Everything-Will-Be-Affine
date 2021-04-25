@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Everything-WIll-Be-IK
 'Everything Will Be IK' is a robust Inverse Kinematics library. 
 </br></br>
@@ -34,3 +35,9 @@ Please let me know if you find bugs you can't fix. Please commit back changes fo
 
 
 
+=======
+# Everything-Will-Be-Affine
+An efficient, simple, and extensible scenegraph module in single and double floating point precision flavors supporting affine transformations.
+
+(See: https://github.com/EGjoni/Everything-Will-Be-IK for usage exampled and documentation.)
+>>>>>>> branch 'master' of https://github.com/EGjoni/Everything-Will-Be-Affine.git
