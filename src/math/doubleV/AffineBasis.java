@@ -185,7 +185,8 @@ public class AffineBasis extends AbstractBasis {
 	 * takes on the same values (not references) as the input basis. 
 	 * @param in
 	 */
-	public void adoptValues(AffineBasis in) {
+	public <T extends AbstractBasis> void adoptValues(T inputBasis) {
+		AffineBasis in = (AffineBasis) inputBasis;
 		super.adoptValues(in);
 		this.shearScaleMatrix.set(in.getShearScaleMatrix());
 		this.composedMatrix.set(in.getComposedMatrix());
@@ -383,7 +384,8 @@ public class AffineBasis extends AbstractBasis {
 	 */
 	public <V extends Vec3d<?>> void setToOrthoNormalGlobalOf(V input, V output) {	
 		if(input != null) {
-			V tempV = output == input ? (V) input.copy() : output;
+			//V tempV = output == input ? (V) input.copy() : output;
+			V tempV = (V) input.copy();
 			reflectionMatrix.transform(tempV, tempV);
 			this.rotation.applyTo(tempV, tempV);
 			output.setX_(tempV.x+translate.x); 
@@ -806,6 +808,7 @@ public class AffineBasis extends AbstractBasis {
 		else 
 			this.chirality = LEFT;
 		this.updateHeadings();
+		this.rotation.setToReversion(inverseRotation);
 		this.updateRays();
 		//if(oldDeterminant != this.chirality)
 		this.updateChirality();
@@ -814,6 +817,7 @@ public class AffineBasis extends AbstractBasis {
 		orthoNormalInversesDirty = true;
 		composedInversesDirty = true;
 		reflectionInversesDirty = true;
+		
 	}
 
 	public void applyRotTo(Rot rotation, Matrix4d inputMatrix, Matrix4d outputMatrix) {		

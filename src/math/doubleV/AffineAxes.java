@@ -1,6 +1,5 @@
 package math.doubleV;
 
-import GiftedApprentice_JME.DVector;
 import math.doubleV.AbstractAxes;
 import math.doubleV.AbstractBasis;
 import math.doubleV.AbstractAxes.DependencyReference;
@@ -59,9 +58,9 @@ public class AffineAxes extends AbstractAxes {
 
 	public AffineAxes(AffineBasis globalMBasis, boolean forceOrthoNormality, AffineAxes object) {
 		super(globalMBasis, object);
-		 xTemp = new sgRayd(new DVector(), new DVector()); 
-		 yTemp = new sgRayd(new DVector(), new DVector()); 
-		 zTemp = new sgRayd(new DVector(), new DVector());
+		 xTemp = new sgRayd(makeDefaultVec(), makeDefaultVec()); 
+		 yTemp = new sgRayd(makeDefaultVec(), makeDefaultVec()); 
+		 zTemp = new sgRayd(makeDefaultVec(), makeDefaultVec());
 		this.forceOrthoNormality = forceOrthoNormality;
 	}
 	
@@ -348,7 +347,7 @@ public class AffineAxes extends AbstractAxes {
 		if(this.dirty || this.scaleDirty) {
 
 			if(this.areGlobal) {
-				getGlobalMBasis().adoptValues(this.getLocalMBasis());
+				this.globalMBasis.adoptValues(this.getLocalMBasis());
 			} else {
 				//parent.markDirty();
 				getParentAxes().updateGlobal();
@@ -362,8 +361,7 @@ public class AffineAxes extends AbstractAxes {
 	} 
 	
 	public void markChildScalesDirty() {
-		for(DependencyReference<AxisDependency> axesRef : dependentsRegistry) {
-			Object axes = axesRef.get(); 
+		for(AxisDependency axes : dependentsSet) {
 			if(axes != null) {
 				if(AffineAxes.class.isAssignableFrom(axes.getClass()))
 					((AffineAxes)axes).markScaleDirty();
@@ -372,8 +370,7 @@ public class AffineAxes extends AbstractAxes {
 	}
 
 	public void markChildReflectionDirty(int flipFlag) {
-		for(DependencyReference<AxisDependency> axesRef : dependentsRegistry) {
-			Object axes = axesRef.get(); 
+		for(AxisDependency axes : dependentsSet) {
 			if(axes != null) {
 				if(AffineAxes.class.isAssignableFrom(axes.getClass()))
 					((AffineAxes)axes).markChildScalesDirty();
@@ -788,6 +785,7 @@ public class AffineAxes extends AbstractAxes {
 		
 	@Override
 	public AffineBasis getGlobalMBasis() {
+		this.updateGlobal();
 		return (AffineBasis)globalMBasis;
 	}
 	
