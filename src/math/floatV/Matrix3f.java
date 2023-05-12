@@ -512,7 +512,7 @@ public class Matrix3f implements Serializable {
 	public SGVec_3f col(int column) {
 		float[] vecarr = new float[3]; 
 		getColumn(column, vecarr);
-		return new SGVec_3f(vecarr);
+		return new SGVec_3f(vecarr[0], vecarr[1], vecarr[2]);
 	}
 	
 	/**

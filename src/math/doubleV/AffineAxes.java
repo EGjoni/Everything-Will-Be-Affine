@@ -1,6 +1,5 @@
 package math.doubleV;
 
-import math.doubleV.AbstractAxes;
 import math.doubleV.AbstractBasis;
 import math.doubleV.AbstractAxes.DependencyReference;
 import math.doubleV.AxisDependency;
@@ -695,23 +694,38 @@ public class AffineAxes extends AbstractAxes {
 		
 	public void rotateAboutX(double angle, boolean orthonormalized) {
 		this.updateGlobal();
-		Rot xRot = new Rot(getGlobalMBasis().getOrthonormalXHead(), angle);		
+		Vec3d<?> xHead = orthonormalized ? getGlobalMBasis().getOrthonormalXHead() : getGlobalMBasis().getXHeading();
+		Rot xRot = new Rot(xHead, angle);
 		this.rotateBy(xRot);
 		this.markDirty();
 	}
 
 	public void rotateAboutY(double angle, boolean orthonormalized) {
-		this.updateGlobal();	
-		Rot yRot = new Rot(getGlobalMBasis().getOrthonormalYHead(), angle); 
+		this.updateGlobal();
+		Vec3d<?> yHead = orthonormalized ? getGlobalMBasis().getOrthonormalYHead() : getGlobalMBasis().getYHeading();
+		Rot yRot = new Rot(yHead, angle);
 		this.rotateBy(yRot);
 		this.markDirty();
 	}
 
 	public void rotateAboutZ(double angle, boolean orthonormalized) {
 		this.updateGlobal();
-		Rot zRot = new Rot(getGlobalMBasis().getOrthonormalZHead(), angle);
+		Vec3d<?> zHead = orthonormalized ? getGlobalMBasis().getOrthonormalZHead() : getGlobalMBasis().getZHeading();
+		Rot zRot = new Rot(zHead, angle);
 		this.rotateBy(zRot);
 		this.markDirty();
+	}
+	
+	public void rotateAboutX(double angle) {
+		this.rotateAboutX(angle, false);
+	}
+
+	public void rotateAboutY(double angle) {
+		this.rotateAboutY(angle, false);
+	}
+
+	public void rotateAboutZ(double angle) {
+		this.rotateAboutZ(angle, false);
 	}
 	
 	public void scaleBy(double scaleX, double scaleY, double scaleZ) {

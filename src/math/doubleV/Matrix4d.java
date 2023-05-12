@@ -87,6 +87,7 @@ public class Matrix4d implements Serializable {
 		val[M22] = 1d;
 		val[M33] = 1d;
 	}
+	
 
 	/** Constructs a matrix from the given matrix.
 	 * 
@@ -172,6 +173,8 @@ public class Matrix4d implements Serializable {
 			break;
 		}
 	}
+	
+	
 	
 	public void setColumn(int column, double[] v) 
 	{   

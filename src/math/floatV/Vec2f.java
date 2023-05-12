@@ -1,6 +1,5 @@
 package math.floatV;
 
-import IKVector;
 import math.floatV.SGVec_2f;
 import math.floatV.Vec2f;
 import math.floatV.Vec3f;

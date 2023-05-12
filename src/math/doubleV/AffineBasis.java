@@ -8,6 +8,7 @@ import math.doubleV.SGVec_3d;
 import math.doubleV.Vec3d;
 import math.doubleV.sgRayd;
 import math.floatV.Vec3f;
+import numerical.Precision.NotARotationMatrixException;
 
 public class AffineBasis extends AbstractBasis {
 
@@ -67,7 +68,7 @@ public class AffineBasis extends AbstractBasis {
 
 
 
-	private boolean initialized = false;
+	
 
 	/**
 	 * A basis is a collection of linearly independent rays + their origin. 
@@ -99,32 +100,56 @@ public class AffineBasis extends AbstractBasis {
 		this.scale.x = x.mag();
 		this.scale.y = y.mag();
 		this.scale.z = z.mag();
+		
 		this.scaledXHeading = xBase.copy();
 		this.scaledYHeading = yBase.copy(); 
 		this.scaledZHeading = zBase.copy();
 		
-		SGVec_3d xDirNew =new SGVec_3d((SGVec_3d) x.heading());
-		SGVec_3d yDirNew =new SGVec_3d((SGVec_3d) y.heading()); 
-		SGVec_3d zDirNew = new SGVec_3d((SGVec_3d) z.heading());   		
-
-		this.rotation = createPrioritzedRotation(xDirNew, yDirNew, zDirNew);
-
-		//if(shearScaleMatrix.determinant() < 0) {		
-		//this.rotation = createIdealRotation(xDirNew, yDirNew, zDirNew);
-		//} else {
-		//this.rotation = new Rot(xBase, yBase, yDirNew, zDirNew);
-		//}
-
-		Rot inverseRot = new Rot(this.rotation.rotation.revert());
-
-		inverseRot.applyTo(xDirNew, xDirNew);
-		inverseRot.applyTo(yDirNew, yDirNew);
-		inverseRot.applyTo(zDirNew, zDirNew);
-
-		setShearXBaseTo(xDirNew, false);
-		setShearYBaseTo(yDirNew, false);
-		setShearZBaseTo(zDirNew, true);
-
+		Vec3d<?>  xDirNew = x.heading().copy();
+		Vec3d<?> yDirNew = y.heading().copy(); 
+		Vec3d<?> zDirNew =  z.heading().copy();   		
+		Vec3d<?>[]  dirNew = new Vec3d<?>[] {xDirNew, yDirNew, zDirNew}; 
+		Vec3d<?>[]  baseDir = new Vec3d<?>[] {xBase, yBase, zBase}; 
+		
+		
+		tempMatrix.val[M00] = xDirNew.x; tempMatrix.val[M10] = xDirNew.y; tempMatrix.val[M20] = xDirNew.z;
+		tempMatrix.val[M01] = yDirNew.x; tempMatrix.val[M11] = yDirNew.y; tempMatrix.val[M21] = yDirNew.z;
+		tempMatrix.val[M02] = zDirNew.x; tempMatrix.val[M12] = zDirNew.y; tempMatrix.val[M22] = zDirNew.z;
+		
+		int negmostidx = -1;
+		if(tempMatrix.det3x3() <0) {
+			double negMost = 1d;
+			//improper rotation, resolve by negating whichever component most deviates from its identity representation
+			for(int i= 0; i<dirNew.length; i++) {
+				double dirdot = dirNew[i].dot(baseDir[i]);
+				if(dirdot < negMost) {
+					negMost = dirdot; negmostidx = i;
+				}
+			}
+			Vec3d<?> nv = dirNew[negmostidx].multCopy(-1d);
+			tempMatrix.setColumn(negmostidx, nv.x, nv.y, nv.z, 0);
+		}
+		double[][] tempMat = new double[3][3]; 
+		
+		createMultiDimMatrixFromMat4d(tempMatrix, tempMat);
+			
+		Rot decompRot = null;
+		try {
+			decompRot = new Rot(new MRotation(tempMat, 0.00000001d, true));
+		} catch (NotARotationMatrixException e) {
+			e.printStackTrace();
+		}
+		applyInverseRotTo(decompRot, tempMatrix, shearScaleMatrix);
+		if(negmostidx > -1) {
+			double[] tempvec = new double[4];
+			shearScaleMatrix.getColumn(negmostidx, tempvec);
+			Vec3d<?> tempV = this.translate.copy().set(tempvec); 
+			tempV.mult(-1d);
+			shearScaleMatrix.setColumn(negmostidx, tempV.x, tempV.y, tempV.z, 0);
+			flippedAxes[negmostidx] = true;
+		}
+		this.rotation = decompRot;
+		this.refreshPrecomputed();
 	}
 	
 
@@ -141,17 +166,6 @@ public class AffineBasis extends AbstractBasis {
 		this.scaledZHeading = zBase.copy();
 		this.refreshPrecomputed();
 	}
-
-	private Rot createPrioritzedRotation(SGVec_3d xHeading, SGVec_3d yHeading, SGVec_3d zHeading) {
-		SGVec_3d tempV = new SGVec_3d();
-		Rot toYX = new Rot(yBase, xBase, yHeading, xHeading); 
-		toYX.applyTo(yBase, tempV);
-		Rot toY = new Rot(tempV, yHeading);
-
-		return toY.applyTo(toYX);
-	}
-
-
 
 	public AffineBasis(AffineBasis input) {
 		super(input.translate);
@@ -229,9 +243,6 @@ public class AffineBasis extends AbstractBasis {
 
 	@Override
 	public <B extends AbstractBasis> void setToLocalOf(B global_input, B local_output) {
-
-		///if a matrix is inverted, reflection should be computed by Reflection *Matrix. 
-		//if a matrix is NOT inverted, reflection should be computed by Matrix * Reflection.	
 
 		this.rotation.applyInverseTo(global_input.rotation, local_output.rotation); 
 		((AffineBasis)local_output).composedMatrix.setToMulOf(this.getInverseComposedMatrix(), ((AffineBasis)global_input).composedMatrix);
@@ -495,9 +506,9 @@ public class AffineBasis extends AbstractBasis {
 		setToComposedZBase(tempV);
 		Vec3f zh = (Vec3f) tempV.toVec3f();
 
-		float xMag = xh.mag();	
-		float yMag = yh.mag();
-		float zMag = zh.mag();
+		String xMag =String.format("%." + 4 + "f", xh.mag() ); 	
+		String yMag =String.format("%." + 4 + "f", yh.mag() ); 
+		String zMag =String.format("%." + 4 + "f", zh.mag() ); 
 		//this.chirality = this.composedMatrix. ? RIGHT : LEFT;
 		String chirality = this.chirality == LEFT ? "LEFT" : "RIGHT";
 		String result = "-----------\n"  
@@ -904,6 +915,16 @@ public class AffineBasis extends AbstractBasis {
 			flipArray[Z] = true;
 		}
 		else flipArray[Z] = false;		
+	}
+	
+	/**
+	 * true if the input axis should be multiplied by negative one after rotation. 
+	 * 
+	 * @param axis
+	 * @return true if axis should be flipped, false otherwise. Default is false. 
+	 */
+	public boolean isAxisFlipped(int axis) {
+		return this.flippedAxes[axis]; 
 	}
 
 
