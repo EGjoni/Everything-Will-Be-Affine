@@ -192,7 +192,7 @@ public class AffineBasis extends AbstractBasis {
 		orthoNormalInversesDirty = true;
 		composedOrthoNormalMatrix = new Matrix4d();
 		inverseComposedOrthoNormalMatrix = new Matrix4d();
-		 this.initialized = true;
+		this.initialized = true;
 	}
 
 	/**
