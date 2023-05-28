@@ -2,6 +2,8 @@ package math.doubleV;
 
 
 
+import org.omg.CORBA.LocalObject;
+
 import math.doubleV.AbstractBasis;
 import math.doubleV.Rot;
 import math.doubleV.SGVec_3d;
@@ -270,6 +272,12 @@ public class AffineBasis extends AbstractBasis {
 
 		local_output.refreshPrecomputed();
 	}
+	
+	public <B extends AbstractBasis> void setToLocalOf(Rot global_input, Rot local_output) {
+		this.refreshPrecomputed();
+		this.inverseRotation.applyTo(global_input, local_output);
+		setToChiralityModifiedRotationOf(local_output, local_output);
+	}
 
 	/**
 	 * like set to OrientationalLocalOf, but acknowledge chirality.
@@ -295,32 +303,39 @@ public class AffineBasis extends AbstractBasis {
 	 * @param globalOutput
 	 */
 	@Override
-	public <B extends AbstractBasis>  void setToGlobalOf(B localInput, B globalOutput) {		
-		this.setToGlobalOf(localInput.translate, globalOutput.translate);
+	public <B extends AbstractBasis>  void applyTo(B localInput, B globalOutput) {		
+		this.applyTo(localInput.translate, globalOutput.translate);
 		tempMatrix.setToMulOf(this.shearScaleMatrix, ((AffineBasis)localInput).composedMatrix);		
 		setToChiralityModifiedRotationOf(localInput.rotation, globalOutput.rotation);
 		applyInverseRotTo(globalOutput.rotation, tempMatrix, ((AffineBasis)globalOutput).shearScaleMatrix);
 		this.rotation.applyTo(globalOutput.rotation, globalOutput.rotation);
 		globalOutput.refreshPrecomputed();
 	}
+	
+	@Override
+	public void applyTo(Rot input, Rot output) {
+		try {
+		setToChiralityModifiedRotationOf(input, output);
+		rotation.applyTo(output, output);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+ 	}
 
 	@Override
-	public Rot getLocalOfRotation(Rot inRot) {	
+	public Rot getLocalizedRotation(Rot inRot) {	
 			SGVec_3d tempV = new SGVec_3d();
 			inRot.getAxis(tempV);
 			this.getInverseComposedOrthoNormalMatrix().transform(tempV, tempV);		
-			return new Rot(tempV, inRot.getAngle()*this.chirality);		
+			return new Rot(tempV, inRot.getAngle() * this.chirality);		
 	}
 	
-
-
 	private void setToChiralityModifiedRotationOf(Rot localRot, Rot outputRot) {
 		SGVec_3d tempV = new SGVec_3d();
 		localRot.getAxis(tempV);
 		this.reflectionMatrix.transform(tempV, tempV);
 		double angle = localRot.getAngle();
-		if(this.chirality == LEFT) angle *=-1;
-		outputRot.set(tempV, angle);
+		outputRot.set(tempV, angle*this.chirality);
 	}
 
 
@@ -413,7 +428,7 @@ public class AffineBasis extends AbstractBasis {
 		output.setZ_(tempV.z+translate.z);  		
 	}
 
-	public <V extends Vec3d<?>> void setToGlobalOf(V input, V output) {
+	public <V extends Vec3d<?>> void applyTo(V input, V output) {
 		V tempV = (V) input.copy();
 		this.composedMatrix.transform(tempV, tempV);		
 		output.set(tempV);
@@ -422,15 +437,16 @@ public class AffineBasis extends AbstractBasis {
 
 
 	public <V extends Vec3d<?>> void setToGlobalOf(V input) {
-		this.setToGlobalOf(input, input);
+		this.applyTo(input, input);
 	}
 
 	public <V extends Vec3d<?>> V getGlobalOf(V input) {
 		V result = (V) input.copy();
-		this.setToGlobalOf(input, result);
+		this.applyTo(input, result);
 		return result;
 	}
-
+	
+	
 	public <V extends Vec3d<?>> void setToLocalOf(V input, V output) {
 		V tempV = (V) input.copy();
 		tempV.set(input);

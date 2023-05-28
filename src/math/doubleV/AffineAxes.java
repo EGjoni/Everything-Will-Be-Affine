@@ -15,7 +15,6 @@ public class AffineAxes extends AbstractAxes {
 	public static SGVec_3d zBase = new SGVec_3d(0,0,1);
 	
 	public boolean scaleDirty = false;
-	public boolean forceOrthoNormality = true;
 	private sgRayd xTemp = new sgRayd(); 
 	private sgRayd yTemp = new sgRayd(); 
 	private sgRayd zTemp = new sgRayd();
@@ -55,8 +54,8 @@ public class AffineAxes extends AbstractAxes {
 	}
 
 
-	public AffineAxes(AffineBasis globalMBasis, boolean forceOrthoNormality, AffineAxes object) {
-		super(globalMBasis, object);
+	public AffineAxes(AffineBasis globalMBasis, boolean forceOrthoNormality, AffineAxes parent) {
+		super(globalMBasis, parent);
 		 xTemp = new sgRayd(makeDefaultVec(), makeDefaultVec()); 
 		 yTemp = new sgRayd(makeDefaultVec(), makeDefaultVec()); 
 		 zTemp = new sgRayd(makeDefaultVec(), makeDefaultVec());
@@ -350,7 +349,7 @@ public class AffineAxes extends AbstractAxes {
 			} else {
 				//parent.markDirty();
 				getParentAxes().updateGlobal();
-				getParentAxes().getGlobalMBasis().setToGlobalOf(this.localMBasis, this.globalMBasis);
+				getParentAxes().getGlobalMBasis().applyTo(this.localMBasis, this.globalMBasis);
 				/*if(this.debug) {	
 					System.out.println("Global Rotation post: \n" + getGlobalMBasis().rotation);
 				}*/
@@ -418,7 +417,7 @@ public class AffineAxes extends AbstractAxes {
 		if(this.forceOrthoNormality)
 			this.setToOrthoNormalizedGlobalOf(input, output);
 		else 
-			getGlobalMBasis().setToGlobalOf(input, output);		
+			getGlobalMBasis().applyTo(input, output);		
 	}
 	
 	
@@ -432,7 +431,7 @@ public class AffineAxes extends AbstractAxes {
 		if(this.forceOrthoNormality)
 			this.setToOrthoNormalizedGlobalOf(in, in);
 		else 
-			getGlobalMBasis().setToGlobalOf(in, in);
+			getGlobalMBasis().applyTo(in, in);
 		return in;
 	}
 	
@@ -444,7 +443,7 @@ public class AffineAxes extends AbstractAxes {
 	 */
 	public <V extends Vec3d<?>> void setToRawGlobalOf(V input, V output) {
 		this.updateGlobal();
-		getGlobalMBasis().setToGlobalOf(input, output);
+		getGlobalMBasis().applyTo(input, output);
 	}
 	
 	public  <V extends Vec3d<?>> V getOrthoNormalizedGlobalOf(V in) {
@@ -494,15 +493,14 @@ public class AffineAxes extends AbstractAxes {
 			this.flipFlag = autoFlip;
 
 			if(autoFlip == 0) {
-
 				Rot newRot = new Rot(this.getParentAxes().getGlobalMBasis().getOrthonormalYHead(), this.getParentAxes().getGlobalMBasis().getOrthonormalZHead(), yHeading, zHeading);//new Rot(this.getGlobalMBasis().yBase, this.getGlobalMBasis().zBase, localY, localZ);/
-				this.getLocalMBasis().rotation = this.getParentAxes().getGlobalMBasis().getLocalOfRotation(newRot);//this.getParentAxes().getGlobalMBasis().rotation.applyInverseTo(newRot.applyTo(this.getParentAxes().getGlobalMBasis().rotation));
+				this.getLocalMBasis().rotation = this.getParentAxes().getGlobalMBasis().getLocalizedRotation(newRot);//this.getParentAxes().getGlobalMBasis().rotation.applyInverseTo(newRot.applyTo(this.getParentAxes().getGlobalMBasis().rotation));
 			} else if( autoFlip == 1) {
 				Rot newRot = new Rot(this.getParentAxes().getGlobalMBasis().getOrthonormalXHead(), this.getParentAxes().getGlobalMBasis().getOrthonormalZHead(), xHeading, zHeading);
-				this.getLocalMBasis().rotation = this.getParentAxes().getGlobalMBasis().getLocalOfRotation(newRot);
+				this.getLocalMBasis().rotation = this.getParentAxes().getGlobalMBasis().getLocalizedRotation(newRot);
 			} else{// if(autoFlip == 2){
 				Rot newRot = new Rot(this.getParentAxes().getGlobalMBasis().getOrthonormalXHead(), this.getParentAxes().getGlobalMBasis().getOrthonormalYHead(), xHeading, yHeading);
-				this.getLocalMBasis().rotation = this.getParentAxes().getGlobalMBasis().getLocalOfRotation(newRot);
+				this.getLocalMBasis().rotation = this.getParentAxes().getGlobalMBasis().getLocalizedRotation(newRot);
 			}
 		}
 		this.getLocalMBasis().setXHeading(localX, false);
